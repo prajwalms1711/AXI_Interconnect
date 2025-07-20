@@ -19,30 +19,73 @@ It ensures reliable and efficient communication between AXI-compliant master and
 
 ---
 
-## 📂 Directory Structure
-```plaintext
-axi_interconnect/
-├── rtl/
-│   ├── axi_interconnect.v
-│   ├── axi_slave_0.v
-│   ├── axi_slave_1.v
-│   └── axi_master_stub.v
-├── tb/
-│   ├── axi_tb.v
-│   ├── axi_if.sv
-│   ├── driver.sv
-│   ├── monitor.sv
-│   ├── transaction.sv
-│   ├── scoreboard.sv
-│   └── axi_test.sv
-├── scripts/
-│   └── compile_and_simulate.do
-├── reports/
-│   ├── synthesis/
-│   ├── timing/
-│   └── area_power/
-├── waveform/
-│   └── axi_waveform.vcd
-├── README.md
-└── doc/
-    └── axi_interconnect_poster.pdf
+
+---
+
+## 🚩 Key Features
+
+✅ **AXI4-Lite Subset Compliance (AMBA 4)**  
+✅ **One Master - Two Slaves** with address-based selection  
+✅ **Dedicated State Machines for AW, W, B, AR, R**  
+✅ **Seamless Data Path Switching Based on Address**  
+✅ **Protocol Correctness Verified via Assertions**  
+✅ **Both ASIC (TSMC 180nm) and FPGA (Artix-7) Ready**  
+✅ **Modular, Reusable, Scalable Design**
+
+---
+
+## 🔨 Implementation Details
+
+### Address Mapping:
+| Slave   | Address Range   |
+|---------|-----------------|
+| Slave 0 | `0x00` - `0x7F` |
+| Slave 1 | `0x80` - `0xFF` |
+
+### State Machine Summary:
+| Channel | Function                         |
+|---------|----------------------------------|
+| AW      | Write Address Phase Control      |
+| W       | Write Data Phase Control         |
+| B       | Write Response Phase Control     |
+| AR      | Read Address Phase Control       |
+| R       | Read Data Phase Control          |
+
+Each channel has a simple **valid/ready handshake-compliant FSM**, ensuring AXI4-Lite protocol correctness.
+
+---
+
+## ✅ Verification Strategy
+
+### 1️⃣ Directed Verilog Testbench
+- Basic read/write transactions to each slave
+- Invalid addresses checked for no response
+- Proper back-pressure simulation
+
+### 2️⃣ Layered SystemVerilog UVM-like Environment
+- Modular classes: `driver`, `monitor`, `transaction`, `scoreboard`
+- Randomized sequences, coverage driven
+- Assertions to check protocol rules
+- Scoreboard to verify functional correctness
+
+### 3️⃣ Waveform Debugging
+- GTKWave `.vcd` analysis for handshakes and data transactions
+
+---
+
+## 📈 Synthesis Results (Summary)
+
+| Platform             | Area      | Power   | Timing      |
+|-----------------------|-----------|---------|-------------|
+| ASIC (TSMC 180nm)     | Optimized | Low     | Met Target  |
+| FPGA (Artix-7, Vivado)| Compact   | Low     | Met Target  |
+
+---
+
+## 🚀 Usage Guide
+
+### Running Simulations (ModelSim/QuestaSim)
+```bash
+cd scripts
+vsim -do compile_and_simulate.do
+
